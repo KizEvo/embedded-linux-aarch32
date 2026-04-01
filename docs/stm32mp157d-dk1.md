@@ -24,3 +24,21 @@ Practical guide and troubleshoot while learning embedded linux on STM32MP157.
 **Network configuration for TFTP protocol**
 
 > This section describe how to setup the guest OS to communicate with STM32MP157 using Ethernet with TFTP protocol.
+
+Oracle VM VirtualBox support enabling networking adapters and they can be configured in multiple modes, the mode we're going to use is [Bridged networking](https://www.virtualbox.org/manual/ch06.html#network_bridged).
+- When enabled, VirtualBox connects to one of your installed network cards and exchanges network packets directly, circumventing your host operating system's network stack.
+- In VirtualBox, turn off the guest OS completely, then right click on the desired guest OS and click `Settings -> Network`.
+    - In our case, the host OS workstation support WiFi and Ethernet, so keep the default Adapter (in `NAT` mode) and enable a new Adapter running `Bridged Adapter`, then select the Controller of the Ethernet port and finally expand the `Advanced` tab and select `Allow All` for Promiscuous mode.
+
+<div align="center">
+  <img width="622" height="268" alt="image" src="https://github.com/user-attachments/assets/08e10302-3f54-4107-8148-53f07ccf8353" />
+</div>
+
+- Turn on the guest OS and run `ip a` to check the new network interface.
+- Config the guest OS ip address via NetworkManager CLI, `nmcli con add type ethernet ifname <network-interface> ip4 <ip-addr>/24`
+    - Example `network-interface=enp0s3` and `ip-addr=192.168.0.1` (make sure STM32MP157 IP address belong to this network segment).
+- Install TFTP server on development workstation (guest OS).
+    - `sudo apt install tftpd-hpa`
+- TFTP client (STM32MP157) can access to files placed under `/srv/tftp`. If not, try to update directory permission `chmod 777 /srv/tftp`.
+    - Add a test file `textfile.txt` to this folder and run `tftp 0xc2000000 textfile.txt` on TFTP client to download the file.
+    - If firewall is enabled on workstation, make sure it does not filter TFTP client request `sudo ufw allow from 192.168.0.100`
