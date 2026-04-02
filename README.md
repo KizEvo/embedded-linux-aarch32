@@ -105,3 +105,17 @@ GNU tools (gcc, binutils) can only be compiled for a specific target architectur
 - Example: `-march=armv7 -mtune=cortex-a8`
 - `-mcpu=cortex-a8` can be used instead to allow gcc to infer the target instruction set and CPU optimizations.
 - https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html
+
+## Boot chain
+
+- Starting Linux on a processor is done in several steps that progressively initialize the platform peripherals and memories. Image source [ST - Boot chain overview](https://wiki.st.com/stm32mpu/wiki/Boot_chain_overview#Linux_start-up). The following image show a generic boot sequence:
+
+<div align="center">
+    <img width="681" height="541" alt="el-boot-chain drawio" src="https://github.com/user-attachments/assets/538a3f4d-4028-461a-84e3-b456b0cdea1f" />
+</div>
+
+- Boot chain on STM32MP15 series. [Image source](https://wiki.st.com/stm32mpu/wiki/Boot_chain_overview#STM32MP15_boot_chain).
+
+<div align="center">
+    <img width="700" height="525" alt="image" src="https://github.com/user-attachments/assets/10428761-6f24-42ce-8da3-4d32bb5b585f" />
+</div>
