@@ -119,3 +119,36 @@ GNU tools (gcc, binutils) can only be compiled for a specific target architectur
 <div align="center">
     <img width="700" height="525" alt="image" src="https://github.com/user-attachments/assets/10428761-6f24-42ce-8da3-4d32bb5b585f" />
 </div>
+
+## Linux kernel
+
+### Overview
+
+- **Manage the hardware resources**: CPU, memory, I/O.
+- **Provide a set of portable, architecture and hardware independent APIs** to allow user space applications and libraries to use the hardware resources.
+- **Handle concurrent accesses and usage of hardware** resources from different applications.
+    - Example: a single network interface is used by multiple user space applications through various network connections. The kernel is responsible for “multiplexing” the hardware resource.
+
+=> The main interface between the kernel and user space is the set of system calls.
+
+=> This system call interface is wrapped by the standard C library, and user space applications usually never make a system call.
+
+- Linux makes system and kernel information available in user space through **pseudo filesystems**, sometimes also called **virtual filesystems**:
+    - Directories and files that do not exist on any real storage.
+    - `proc`, mounted on `/proc`
+      - Operating system related information (processes, memory management parameters...)
+    - `sysfs`, mounted on `/sysfs`
+      - Representation of the system as a tree of devices connected by buses.
+
+### Kernel building
+
+1. Environment setup and configuration.
+    1. Specify target architecture: `export ARCH=arm`
+    2. Specify cross-compiler: `export CROSS_COMPILE=arm-linux-`
+    3. Kernel configuration, get reference: `make soc_defconfig`
+    4. Customize configuration: `make menuconfig`
+2. Kernel building and deployment.
+    1. Compile the kernel and modules: `make`
+    2. Install kernel/modules:
+       - Kernel: `make install` or manual copy
+       - Modules: `make modules_install`
