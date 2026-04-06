@@ -108,17 +108,28 @@ GNU tools (gcc, binutils) can only be compiled for a specific target architectur
 
 ## Boot chain
 
+### Generic boot sequence
+
 - Starting Linux on a processor is done in several steps that progressively initialize the platform peripherals and memories. Image source [ST - Boot chain overview](https://wiki.st.com/stm32mpu/wiki/Boot_chain_overview#Linux_start-up). The following image show a generic boot sequence:
 
 <div align="center">
     <img width="681" height="541" alt="el-boot-chain drawio" src="https://github.com/user-attachments/assets/538a3f4d-4028-461a-84e3-b456b0cdea1f" />
 </div>
 
-- Boot chain on STM32MP15 series. [Image source](https://wiki.st.com/stm32mpu/wiki/Boot_chain_overview#STM32MP15_boot_chain).
+### Boot sequence on STM32MP15 series.
+
+- [Image source](https://wiki.st.com/stm32mpu/wiki/Boot_chain_overview#STM32MP15_boot_chain).
 
 <div align="center">
     <img width="700" height="525" alt="image" src="https://github.com/user-attachments/assets/10428761-6f24-42ce-8da3-4d32bb5b585f" />
 </div>
+
+### ROM - Boot from SDCard on STM32MP15 series.
+
+- SD cards contain two versions of the FSBL. The ROM code tries to load and launch the first copy. In the case of failure, it then tries to load the second copy.
+- The ROM code first looks for a Global Positioning Table (GPT).
+- If it finds it:
+    - On STM32MP15x lines, it locates two FSBLs by looking for the two first GPT entries of which the name begins with `fsbl`.
 
 ## Linux kernel
 
