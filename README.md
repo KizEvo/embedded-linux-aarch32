@@ -165,3 +165,18 @@ GNU tools (gcc, binutils) can only be compiled for a specific target architectur
     2. Install kernel/modules:
        - Kernel: `make install` or manual copy
        - Modules: `make modules_install`
+
+### Kernel to first user space application boot process
+
+1. Bootloader (e.g `U-Boot`)
+    1. Loads kernel image + `.dtb` to RAM, start the kernel.
+2. Kernel
+    1. Initialize hardware devices and kernel subsystems.
+    2. Mount the `root /` filesystem indicated by `root=`.
+    3. Start the init application, `/sbin/init` by default (e.g BusyBox).
+3. `/sbin/init`
+    1. Starts other user space services and application.
+      - Shell.
+      - Other application.
+
+The sequence above could apply to booting with Network File System (NFS).
