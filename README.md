@@ -148,8 +148,10 @@ GNU tools (gcc, binutils) can only be compiled for a specific target architectur
     - Directories and files that do not exist on any real storage.
     - `proc`, mounted on `/proc`
       - Operating system related information (processes, memory management parameters...)
+      - `mount -t proc nodev /proc`
     - `sysfs`, mounted on `/sysfs`
       - Representation of the system as a tree of devices connected by buses.
+      - `mount -t sysfs nodev /sys`
 
 ### Kernel building
 
