@@ -153,6 +153,41 @@ GNU tools (gcc, binutils) can only be compiled for a specific target architectur
       - Representation of the system as a tree of devices connected by buses.
       - `mount -t sysfs nodev /sys`
 
+### Root filesystem
+
+Filesystems are used to organize data in directories and files on storage devices or on the network. The directories and files are organized as a hierarchy
+- In UNIX systems, applications and users see a single global hierarchy of files and
+directories, which can be composed of several filesystems.
+- Filesystems are mounted in a specific location in this hierarchy of directories
+    - When a filesystem is mounted in a directory (called mount point), the contents of this directory reflect the contents of this filesystem.
+    - When the filesystem is unmounted, the mount point is empty again.
+= This allows applications to access files and directories easily, regardless of their exact storage location
+
+`mount` allows to mount filesystems
+- `mount -t type device mountpoint`
+- `type` is the type of filesystem (optional for non-virtual filesystems)
+- `device` is the storage device, or network location to mount
+• `mountpoint` is the directory where files of the storage device or network location will be accessible
+
+`umount` allows to unmount filesystems
+- This is needed before rebooting, or before unplugging a USB key, because the Linux kernel caches writes in memory to increase performance. umount makes sure that these writes are committed to the storage
+
+A particular filesystem is mounted at the root of the hierarchy, identified by `/`. This filesystem is called the root filesystem
+
+As `mount` and `umount` are programs, they are files inside a filesystem. They are not accessible before mounting at least one filesystem.
+
+As the root filesystem is the first mounted filesystem, it cannot be mounted with the normal mount command. It is mounted directly by the kernel, according to the `root=` kernel option
+
+It can be mounted from different locations
+- From the partition of a hard disk
+- From the partition of a USB key
+- From the partition of an SD card
+- From the partition of a NAND flash chip or similar type of storage device
+- From the network, using the NFS protocol
+    - Install an NFS server on workstation (example: Debian, Ubuntu)
+    - `sudo apt install nfs-kernel-server`
+- From memory, using a pre-loaded filesystem (by the bootloader)
+
 ### Kernel building
 
 1. Environment setup and configuration.
