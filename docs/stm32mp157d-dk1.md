@@ -2,6 +2,36 @@
 
 Practical guide and troubleshoot while learning embedded linux on STM32MP157.
 
+### Linux Kernel
+
+#### Guides
+
+**Kernel/Modules compilation and installation**
+
+> This section describe how Kernel/Modules compilation and installation steps.
+
+- Specify the architecture for the kernel to build (can be define as environment var or pass with `make`).
+    - Set `ARCH` to the name of a directory under `linux/arch/`: ARCH=arm or ARCH=arm64 or ARCH=riscv, etc
+- Choose a compiler `CROSS_COMPILE` (can be define as environment var or pass with `make`).
+    - The compiler invoked by the kernel Makefile is `$(CROSS_COMPILE)gcc`: CROSS_COMPILE=arm-linux-
+- Pick initial config.
+    - Default configurations stored in-tree as minimal configuration files `arch/<arch>/configs/`
+    - `make foo_defconfig`
+- Customize config - `make menuconfig`.
+    - `make oldconfig`. Useful to upgrade a `.config` file from an earlier kernel release. If you edit a `.config` file by hand, it’s useful to run make oldconfig afterwards, to set values to new parameters that could have appeared because of dependency changes.
+- Kernel compilation.
+    - `make`. Use more CPU core `make -j n`
+    - Only works from the top kernel source directory
+- Kernel compilation result.
+    - `arch/<arch>/boot/Image`, uncompressed kernel image that can be booted
+    - `arch/<arch>/boot/*Image*`, compressed kernel images that can also be booted: `bzImage` for x86, `zImage` for ARM (32-bit), `Image.gz` for RISC-V, `vmlinux.bin.gz` for ARC, etc.
+    - `arch/<arch>/boot/dts/<vendor>/*.dtb`, compiled Device Tree Blobs.
+    - All kernel modules, spread over the kernel source tree, as .ko (Kernel Object) files: use `grep "*.ko" ./* -r`.
+    - `vmlinux`, a raw uncompressed kernel image in the ELF format, useful for debugging purposes but generally not used for booting purposes
+- Modules installation.
+    - Compile modules `make modules`.
+    - `make INSTALL_MOD_PATH=<dir>/ modules_install` (`INSTALL_MOD_PATH` is useful for cross-compiling target as without this they would install under host `/lib/modules`).
+
 ### VirtualBox
 
 #### Guides
