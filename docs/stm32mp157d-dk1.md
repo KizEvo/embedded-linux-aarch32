@@ -32,6 +32,8 @@ Practical guide and troubleshoot while learning embedded linux on STM32MP157.
     - Compile modules `make modules`.
     - `make INSTALL_MOD_PATH=<dir>/ modules_install` (`INSTALL_MOD_PATH` is useful for cross-compiling target as without this they would install under host `/lib/modules`).
 
+**Note: Compile Device Tree Source DTS `make dtbs`**.
+
 ### VirtualBox
 
 #### Guides
