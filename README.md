@@ -167,7 +167,7 @@ directories, which can be composed of several filesystems.
 - `mount -t type device mountpoint`
 - `type` is the type of filesystem (optional for non-virtual filesystems)
 - `device` is the storage device, or network location to mount
-• `mountpoint` is the directory where files of the storage device or network location will be accessible
+- `mountpoint` is the directory where files of the storage device or network location will be accessible
 
 `umount` allows to unmount filesystems
 - This is needed before rebooting, or before unplugging a USB key, because the Linux kernel caches writes in memory to increase performance. umount makes sure that these writes are committed to the storage
