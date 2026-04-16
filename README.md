@@ -215,3 +215,28 @@ It can be mounted from different locations
       - Other application.
 
 The sequence above could apply to booting with Network File System (NFS).
+
+### Kernel drivers
+
+Typical software stack for hardware access, from the bottom to the top:
+- A bus controller driver in the kernel drives an I2C, SPI, USB, PCI controller
+- A bus subsystem provides an API for drivers to access a particular type of bus: I2C, SPI, PCI, USB, etc.
+- A device driver in the kernel drives a particular device connected to a given bus.
+- A driver subsystem exposes features of certain class of devices, through a standard kernel/user-space interface.
+- An application can access the device through this standard kernel/user-space interface either directly or through a library.
+
+```c
+        Application
+            |    |
+        Library  |
+            |    |
+----Kernel/Userspace interface----
+              |
+        Driver Subsystem
+              |
+        Device Driver
+              |
+        Bus Subsystem
+              |
+        Bus Controller Driver
+```
