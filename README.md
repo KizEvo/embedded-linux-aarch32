@@ -240,3 +240,29 @@ Typical software stack for hardware access, from the bottom to the top:
               |
         Bus Controller Driver
 ```
+
+### User-space interfaces for hardware devices
+
+For a high-level perspective: three main interfaces to access hardware devices exposed by the Linux kernel:
+- Device nodes in /dev
+    - In the Linux kernel, most devices are presented to user space applications through two different abstractions
+    - **Block device**
+        - A device composed of fixed-sized blocks, that can be read and written to store data. Used for hard disks, USB keys, SD cards.
+    - **Character device**
+        - Used for serial ports, terminals, but also sound cards, video acquisition devices, frame buffers. Most of the devices that are not block devices are represented as character devices by the Linux kernel.
+    - Internally, the kernel identifies each device by a triplet of information
+        - Type (character or block)
+        - Major (typically the category of device)
+        - Minor (typically the identifier of the device)
+- Entries in the sysfs filesystem
+- Network sockets and related APIs
+
+A very important UNIX design decision was to represent most system objects as **files**"
+- It allows applications to manipulate all system objects with the normal file API (open, read, write, close, etc.)
+- So, devices had to be represented as files to the applications
+- This is done through a special artifact called a **device file**
+- It is a special type of file, that associates a file name visible to user space applications to the triplet (type, major, minor) that the kernel understands
+- All device files are by convention stored in the /dev directory
+
+The `devtmpfs` virtual filesystem can be mounted on /dev → the kernel automatically creates/removes device files
+- `CONFIG_DEVTMPFS_MOUNT` - asks the kernel to mount devtmpfs automatically at boot time (except when booting on an initramfs)
