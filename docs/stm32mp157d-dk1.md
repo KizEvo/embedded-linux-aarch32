@@ -38,6 +38,15 @@ Practical guide and troubleshoot while learning embedded linux on STM32MP157.
 
 #### Guides
 
+**Connect to guest OS with SSH**
+
+> This section describe how to setup the guest OS so that the host machine can use SSH to access it.
+
+- Configure the guest OS Network. Network -> Adapter # -> Attached to: NAT -> Advanced -> Port Forwarding -> Update Host Port to 2222 and Guest Port to 22 (leave everything else as is).
+- Start the guest OS and install OpenSSH -> `sudo apt install openssh-server` -> `sudo systemctl enable ssh` -> `sudo systemctl status ssh` (optional check).
+- Open a terminal in host machine and connect to guest OS -> `ssh <username>@127.0.0.1 -p 2222`
+- VSCode SSH -> Install Remote - SSH extension -> Connect to remote SSH -> Add new host `ssh <username>@127.0.0.1 -p 2222`
+
 **USB connections (SDCard, Serial communication)**
 
 > This section describe how to setup the guest OS to access the USB devices on host OS.
