@@ -2,6 +2,23 @@
 
 Practical guide and troubleshoot while learning embedded linux on STM32MP157.
 
+### Zephyr RTOS
+
+**Setup Zephyr workspace**
+
+> This section describe how to setup Zephyr workspace for Cortex-M4 development on STM32MP157D-DK1.
+
+- Follow the guides on [Zephyr page](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
+    - In the install SDK section, after SDK installation, run the `setup.sh` script inside the SDK directory - refer [link](https://docs.zephyrproject.org/latest/develop/toolchains/zephyr_sdk.html#zephyr-sdk-installation).
+- Create an application inside the Zephyr workspace (same directory as `zephyr` project) - refer [link](https://docs.zephyrproject.org/latest/develop/application/index.html#creating-an-application).
+    - Clone the example-application - `git clone https://github.com/zephyrproject-rtos/example-application my-app`
+ - Inside the application directory, update west manifest path to point to the application, `west config manifest.path my-app`
+ - Inside my-app, checkout a desired release tag, `git checkout v4.4.0` then run `west update`
+ - Create `zephyrrc` file to store Zephyr important enviroment variables - that will be used for firmware build - refer [zephyrrc link](https://docs.zephyrproject.org/latest/develop/env_vars.html#option-3-using-zephyrrc-files) and [env var link](https://docs.zephyrproject.org/latest/develop/env_vars.html#important-environment-variables)
+    - Create `zephyrrc` in `$HOME/.config/zephyr/zephyrrc` then add desired environment variables.
+    - `export BOARD=custom_plank` `export ZEPHYR_SDK_INSTALL_DIR=<path_to_sdk>`
+- Build firmware in application directory `west build app`
+
 ### Linux Kernel
 
 #### Guides
