@@ -19,6 +19,45 @@ Practical guide and troubleshoot while learning embedded linux on STM32MP157.
     - `export BOARD=custom_plank` `export ZEPHYR_SDK_INSTALL_DIR=<path_to_sdk>`
 - Build firmware in application directory `west build app`
 
+**STM32MP157D-DK1 M4 firmware build, flash and run**
+
+> This section describe step by step the process of building the workspace, build firmware, then flash and finally run firmware on Cortex-M4.
+
+> [!NOTE]
+> You don't need to follow the steps here if you just want to use the zephyr-stm32mp157 branch, it has everything needed to run a simple OpenAMP application on Cortex-M4.
+> But some of the steps are nice to know (e.g u-boot loads M4 firmware images)
+
+- For technical details, refer the commits of [zephyr-stm32mp157 repository](https://github.com/KizEvo/zephyr-stm32mp157d/tree/phunguyen/stm32mp157d-dev)
+- We'll use Zephyr's example-application code as boilerplate for our Zephyr STM32MP157D workspace.
+- Create `stm32mp157d_dk1` board directory, refer [Zephyr Board Porting Guide](https://docs.zephyrproject.org/latest/hardware/porting/board_porting.html#create-your-board-directory)
+    - The [`stm32mp157c_dk2` board directory](https://github.com/zephyrproject-rtos/zephyr/tree/main/boards/st/stm32mp157c_dk2) is a good reference, all of the configs (Kconfigs and DTS) can be apply to STM32MP157D.
+- Update the example-application `app/src/main.c`, remove unrelated code to test simple build - refer [commit](https://github.com/KizEvo/zephyr-stm32mp157d/commit/5cb5d3dc0c1e2601eaa2d03211e5189599095b8f).
+    - `west build app` or `west build -b stm32mp157d_dk1 app` to build firmware image.
+- Build and get the M4 firmware image under build directory `build/zephyr/zephyr.elf`.
+- Use u-boot to load M4 firmware image ([u-boot STM32MP1 spec](https://docs.u-boot.org/en/v2021.04/board/st/stm32mp1.html#coprocessor-firmware)):
+    - Two ways to store image:
+        - Store `zephyr.elf` in the ext4 partition of the SDCard.
+        - Store `zephyr.elf` in TFTP folder of host machine (e.g `/srv/tftp`) that the STM32MP157D can access via Ethernet.
+    - During u-boot, load the `zephyr.elf` to RAM:
+        - If image in SDCard, `load mmc 0:4 0xc1000000 zephyr.elf`
+        - If image in TFTP folder, `tftp 0xc1000000 zephyr.elf`
+    - Use `rproc` command to start Cortex-M4.
+        - `rproc init`
+        - `rproc list` - get the M4 device id.
+        - `rproc load ${dev_id} ${loadaddr_copro} ${filesize_in_byte}`
+        - `rproc start ${dev_id}`
+    - At this stage, you'll see u-boot warn user about M4 .elf doesn't have .resource_table section defined. This is necessary for inter-process communication between A7 and M4 cores - [see document](https://wiki.st.com/stm32mpu/wiki/Cortex-M_remote_processor_management_overview#System_overview).
+        - But if there is no requirement for IPC then you can ignore it.
+- Use Linux to load M4 firmware image ([STM32Wiki Linux remoteproc spec](https://wiki.st.com/stm32mpu/wiki/Linux_remoteproc_framework_overview#Framework_purpose)).
+    - Config Linux:
+        - Activate the remoteproc driver and framework in the kernel configuration using the Linux Menuconfig tool.
+        - Device drivers ---> Remoteproc drivers ---> [x] Support for Remote Processor subsystem [x] STM32 remoteproc support.
+            - The module should be built statically into the kernel. If not, we'll need to load it during boot with `modprobe stm32_ipcc`.
+        - Build the Linux kernel using Buildroot.
+    - Two ways to store image, but first we'll need to rename the image to `rproc-m4-fw`:
+        - Store the image in `/lib/firmware` of **rootfs**. The standard way in Buildroot is to use a Root Filesystem Overlay. It is copied directly onto the target filesystem after the build but before the image is created. Then we'll create a filesystem image (e.g SquashFS image) of the rootfs and store it in a partition of the SDCard.
+        - Store the image in `/lib/firmware` of **nfsroot**. This method allow target system to load root filesystem via NFS (host machine store the root filesystem, target machine simply use it via NFS). This method allow fast development process as we don't need to keep moving SDCard between host and target machine.
+
 ### Linux Kernel
 
 #### Guides
