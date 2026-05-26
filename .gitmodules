@@ -1,0 +1,4 @@
+[submodule "zephyr-stm32mp157d"]
+	path = zephyr-stm32mp157d
+	url = https://github.com/KizEvo/zephyr-stm32mp157d.git
+	branch = phunguyen/stm32mp157d-dev
