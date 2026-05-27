@@ -13,6 +13,7 @@ Embedded Linux learning journey using STM32MP157D platform with dual Arm Cortex-
 - Any STM32MP157 series from [STmicroelectronic](https://www.st.com/en/microcontrollers-microprocessors/stm32mp157.html).
     - In this project, we'll be using [discovery kit with STM32MP157D MPU](https://www.st.com/en/evaluation-tools/stm32mp157d-dk1.html).
 - Ethernet cable, 5 V / 3 A USB-C power supply, USB-A to micro USB-B cable (for serial communication between host and target machine).
+- USB to UART adapter for M4 UART console display.
 
 ### Softwares and Tools
 - Host machine running Linux OS, or virtualization software to emulate Linux OS such as [VirtualBox](https://www.virtualbox.org/).
