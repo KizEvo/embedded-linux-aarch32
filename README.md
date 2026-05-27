@@ -3,6 +3,9 @@ Embedded Linux learning journey using STM32MP157D platform with dual Arm Cortex-
 
 > Embedded Linux is the usage of the Linux kernel and various open-source components in embedded systems.
 
+<div align="center">
+  <img width="286" height="315" alt="image" src="https://github.com/user-attachments/assets/fc138c57-e404-431c-a7f6-6b1155166ccd" />
+</div>
 ## Prerequisite
 
 ### Hardwares
