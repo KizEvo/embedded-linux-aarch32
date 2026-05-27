@@ -24,8 +24,7 @@ Practical guide and troubleshoot while learning embedded linux on STM32MP157.
 > This section describe step by step the process of building the workspace, build firmware, then flash and finally run firmware on Cortex-M4.
 
 > [!NOTE]
-> You don't need to follow the steps here if you just want to use the zephyr-stm32mp157 branch, it has everything needed to run a simple OpenAMP application on Cortex-M4.
-> But some of the steps are nice to know (e.g u-boot loads M4 firmware images)
+> You don't need to follow the steps here if you just want to use code from zephyr-stm32mp157 repository, it has everything needed to run a simple OpenAMP application on Cortex-M4.
 
 - For technical details, refer the commits of [zephyr-stm32mp157 repository](https://github.com/KizEvo/zephyr-stm32mp157d/tree/phunguyen/stm32mp157d-dev)
 - We'll use Zephyr's example-application code as boilerplate for our Zephyr STM32MP157D workspace.
@@ -49,14 +48,31 @@ Practical guide and troubleshoot while learning embedded linux on STM32MP157.
     - At this stage, you'll see u-boot warn user about M4 .elf doesn't have .resource_table section defined. This is necessary for inter-process communication between A7 and M4 cores - [see document](https://wiki.st.com/stm32mpu/wiki/Cortex-M_remote_processor_management_overview#System_overview).
         - But if there is no requirement for IPC then you can ignore it.
 - Use Linux to load M4 firmware image ([STM32Wiki Linux remoteproc spec](https://wiki.st.com/stm32mpu/wiki/Linux_remoteproc_framework_overview#Framework_purpose)).
+    - Define .resource_table section in firmware image .elf. It allows a remote processor (M4) to publish system resource requirements to a master host processor (A7 running Linux).
+        - Utilize [OpenAMP project](https://openamp.readthedocs.io/en/latest/openamp/overview.html#openamp-architecture) to define .resource_table and IPC method between M4 and A7. Refer [STM32Wiki M4 spec](https://wiki.st.com/stm32mpu/wiki/Cortex-M_remote_processor_management_overview#Functional_features_and_design).
+        - Add `open-amp` and `libmetal` to Zephyr example-application [west manifest name-allowlist](https://docs.zephyrproject.org/latest/develop/west/manifest.html#option-3-mapping) so that OpenAMP is included during build process.
+        - Refer sample [OpenAMP resource table](https://github.com/zephyrproject-rtos/zephyr/tree/main/samples/subsys/ipc/openamp_rsc_table) code in upstream Zephyr.
+        - Update `app/src/main.c` with OpenAMP sample code and build new M4 firmware image.
     - Config Linux:
         - Activate the remoteproc driver and framework in the kernel configuration using the Linux Menuconfig tool.
-        - Device drivers ---> Remoteproc drivers ---> [x] Support for Remote Processor subsystem [x] STM32 remoteproc support.
+        - Device drivers ---> Remoteproc drivers ---> [x] Support for Remote Processor subsystem [x] STM32 remoteproc support. Refer [A7 kernel config](https://wiki.st.com/stm32mpu/wiki/Linux_remoteproc_framework_overview#Kernel_configuration).
             - The module should be built statically into the kernel. If not, we'll need to load it during boot with `modprobe stm32_ipcc`.
         - Build the Linux kernel using Buildroot.
-    - Two ways to store image, but first we'll need to rename the image to `rproc-m4-fw`:
-        - Store the image in `/lib/firmware` of **rootfs**. The standard way in Buildroot is to use a Root Filesystem Overlay. It is copied directly onto the target filesystem after the build but before the image is created. Then we'll create a filesystem image (e.g SquashFS image) of the rootfs and store it in a partition of the SDCard.
-        - Store the image in `/lib/firmware` of **nfsroot**. This method allow target system to load root filesystem via NFS (host machine store the root filesystem, target machine simply use it via NFS). This method allow fast development process as we don't need to keep moving SDCard between host and target machine.
+    - Two ways to store image, but first we'll need to rename the image to `rproc-m4-fw` as required by [auto-boot section](https://wiki.st.com/stm32mpu/wiki/Linux_remoteproc_framework_overview#Remote_processor_-27auto-27_boot):
+        - Store the image in `/lib/firmware` of **rootfs**. The standard way in Buildroot is to use a Root Filesystem Overlay. It is copied directly onto the target filesystem after the build but before the image is created. Then we'll create a filesystem image (e.g SquashFS image or your preferred image type) of the rootfs and store it in a partition of the SDCard.
+        - Store the image in `/lib/firmware` of **nfsroot**. This method allow target system to load root filesystem via NFS (Network File System). This method allow fast development process as we don't need to keep moving SDCard between host PC and target machine.
+        - Refer [bootlin training page](https://bootlin.com/doc/training/embedded-linux/embedded-linux-stm32mp1-labs.pdf) for setup details.
+- Results on A7 terminal.
+```
+[    8.685236] stm32-ipcc 4c001000.mailbox: ipcc rev:1.0 enabled, 6 chans, proc 0
+[    8.692757] stm32-rproc 10000000.m4: wdg irq registered
+[    8.698537] remoteproc remoteproc0: m4 is available
+Starting network: [    9.097020] remoteproc remoteproc0: powering up m4
+[    9.100674] remoteproc remoteproc0: Booting fw image rproc-m4-fw, size 1341204
+[    9.108956] rproc-virtio rproc-virtio.0.auto: assigned reserved memory node vdev0buffer@10042000
+[    9.116846] rproc-virtio rproc-virtio.0.auto: registered virtio0 (type 7)
+[    9.123424] remoteproc remoteproc0: remote processor m4 is now up
+```
 
 ### Linux Kernel
 
