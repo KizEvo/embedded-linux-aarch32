@@ -74,6 +74,46 @@ Starting network: [    9.097020] remoteproc remoteproc0: powering up m4
 [    9.123424] remoteproc remoteproc0: remote processor m4 is now up
 ```
 
+- Enable IPC communication between A7 and M4 with [RPMsg Client Sample](https://elixir.bootlin.com/linux/v7.0.10/source/samples/rpmsg/rpmsg_client_sample.c).
+    - Create an endpoint `rpmsg-client-sample` on M4 to receive and send message from/to A7 - refer [commit](https://github.com/KizEvo/zephyr-stm32mp157d/commits/phunguyen/stm32mp157d-dev/).
+    - Enable A7 Linux Kconfig `CONFIG_SAMPLE_RPMSG_CLIENT` - In menuconfig, Kernel hacking ---> Sample kernel code ---> Build rpmsg client sample (loadable modules only).
+    - Build A7 Linux kernel and M4 firmware.
+    - During A7 kernel boot, we need to load these modules `virtio_rpmsg_bus`, `rpmsg_client_sample`, `rpmsg_core` and `rpmsg_ns` (usually the first 2 modules are enough, as `modprobe` will load the dependant modules).
+- Results on A7 terminal and M4 terminal.
+```
+[  275.144824] virtio_rpmsg_bus virtio0: rpmsg host is online
+[  275.145864] virtio_rpmsg_bus virtio0: creating channel rpmsg-client-sample addr 0x400
+[  275.157238] rpmsg_client_sample virtio0.rpmsg-client-sample.-1.1024: new channel: 0x400 -> 0x400!
+[  275.166345] rpmsg_client_sample virtio0.rpmsg-client-sample.-1.1024: incoming msg 1 (src: 0x400)
+[  275.175075] rpmsg_client_sample virtio0.rpmsg-client-sample.-1.1024: incoming msg 2 (src: 0x400)
+...
+[  276.040228] rpmsg_client_sample virtio0.rpmsg-client-sample.-1.1024: incoming msg 99 (src: 0x400)
+[  276.049116] rpmsg_client_sample virtio0.rpmsg-client-sample.-1.1024: incoming msg 100 (src: 0x400)
+[  276.058040] rpmsg_client_sample virtio0.rpmsg-client-sample.-1.1024: goodbye!
+[  276.065239] virtio_rpmsg_bus virtio0: destroying channel rpmsg-client-sample addr 0x400
+[  276.073392] rpmsg_client_sample virtio0.rpmsg-client-sample.-1.1024: rpmsg sample client driver is removed
+```
+
+```
+*** Booting Zephyr OS build v4.4.0 ***
+[00:00:00.000,000] <inf> main: Zephyr Example Application 1.0.0
+[00:00:00.000,000] <inf> main: Start OpenAMP thread!
+[00:00:00.000,000] <inf> main: OpenAMP[remote] Linux responder demo started
+[00:00:00.000,000] <inf> main: Start blinking forever
+[00:04:25.605,000] <inf> main: platform_ipm_callback: msg received from mb 0
+[00:04:25.606,000] <inf> main: OpenAMP[remote] Init success, start rpmsg client
+[00:04:25.606,000] <inf> main: OpenAMP[remote] Linux sample client responder started
+[00:04:25.626,000] <inf> main: platform_ipm_callback: msg received from mb 1
+[00:04:25.626,000] <inf> main: [Linux sample client] incoming msg 1: hello world!
+[00:04:25.635,000] <inf> main: platform_ipm_callback: msg received from mb 1
+[00:04:25.635,000] <inf> main: [Linux sample client] incoming msg 2: hello world!
+...
+[00:04:26.499,000] <inf> main: [Linux sample client] incoming msg 99: hello world!
+[00:04:26.508,000] <inf> main: platform_ipm_callback: msg received from mb 1
+[00:04:26.508,000] <inf> main: [Linux sample client] incoming msg 100: hello world!
+[00:04:26.508,000] <inf> main: OpenAMP Linux sample client responder ended
+```
+
 ### Linux Kernel
 
 #### Guides
