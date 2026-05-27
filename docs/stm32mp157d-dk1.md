@@ -62,6 +62,7 @@ Practical guide and troubleshoot while learning embedded linux on STM32MP157.
         - Store the image in `/lib/firmware` of **rootfs**. The standard way in Buildroot is to use a Root Filesystem Overlay. It is copied directly onto the target filesystem after the build but before the image is created. Then we'll create a filesystem image (e.g SquashFS image or your preferred image type) of the rootfs and store it in a partition of the SDCard.
         - Store the image in `/lib/firmware` of **nfsroot**. This method allow target system to load root filesystem via NFS (Network File System). This method allow fast development process as we don't need to keep moving SDCard between host PC and target machine.
         - Refer [bootlin training page](https://bootlin.com/doc/training/embedded-linux/embedded-linux-stm32mp1-labs.pdf) for setup details.
+        - Useful Kconfig for Buildroot [buildroot-external-st](https://github.com/bootlin/buildroot-external-st).
 - Results on A7 terminal.
 ```
 [    8.685236] stm32-ipcc 4c001000.mailbox: ipcc rev:1.0 enabled, 6 chans, proc 0
